@@ -7,7 +7,7 @@ namespace spaceShooter
         static void Main(string[] args)
         {
             Console.CursorVisible = false;
-            spaceShooter spaceShooter = new spaceShooter(30,20);  //szerokosc 30 wysokosc 20 
+            spaceShooter spaceShooter = new spaceShooter(25,20);  //szerokosc 30 wysokosc 20 
             spaceShooter.Run();
             Console.ReadKey();
         }

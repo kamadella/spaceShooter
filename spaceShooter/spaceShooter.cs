@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Numerics;
+using System.Collections;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace spaceShooter
 {
@@ -15,6 +17,10 @@ namespace spaceShooter
         int height;
         Board board;
         Player player;
+        int shootTimer = 20;
+        List<Enemy> enemies = new List<Enemy>();
+        int enemySpawner = 10;
+        int score = 0;
         ConsoleKeyInfo keyInfo;
         ConsoleKey consoleKey;
 
@@ -48,8 +54,21 @@ namespace spaceShooter
             {
                 Console.Clear();
                 Setup();
-                board.Write();
-                player.Write();
+                board.Write(); //narysuj plansze
+                player.Write(); //narysuj bohatera
+
+
+
+                //ilsc przeciwnikow 
+                for (int i=0; i < enemySpawner; i++)
+                {
+                    var enemy = new Enemy(2 + i, 6, 1); ;
+                    enemies.Add(enemy);
+                    
+                }
+
+
+
                 while (true)
                 {
                     Input();
@@ -61,56 +80,150 @@ namespace spaceShooter
                         case ConsoleKey.D:
                             player.Right();
                             break;
+                        case ConsoleKey.P: //strzelanie
+                                var bullet = new Bullet(player.posX);
+                                player.bullets.Add(bullet); //jak klikne P to powstaje nowy pocisk
+                            break;
                     }
                     consoleKey = ConsoleKey.N;
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
+
+                    //wynik
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.SetCursorPosition(4, 2);
+                    Console.Write("Punkty: " + score);
+                    Console.ForegroundColor = ConsoleColor.White;
+
+
+
+                    //Bullets
+                    for (int i = 0; i < player.bullets.Count; i++)
+                    {
+                        //wypisywanie pocisku
+                        player.bullets[i].posY -= 1;
+                        player.bullets[i].Write();
+
+
+
+                        for (int k = 0; k < enemies.Count; k++)
+                        {
+                            if (player.bullets[i].posY == enemies[k].posY && player.bullets[i].posX == enemies[k].posX)
+                            {
+                                if (enemies[k].HP <= 1)
+                                {
+                                    score += enemies[k].HPMax;
+                                    enemies.RemoveAt(i);
+                                }
+                                else
+                                    enemies[k].HP--; //obrażenia dla wroga
+
+                                player.bullets.RemoveAt(i);
+                                break;
+                            }
+                        }
+
+                        if (player.bullets[i].posY <= 6) //usun bulleta jak wyjdzie poza plansze
+                        {
+                            Console.SetCursorPosition(player.bullets[i].posX, player.bullets[i].posY);
+                            Console.Write(" ");
+                            player.bullets.RemoveAt(i);
+                        }
+
+
+                    }
+
+
+
+                    //------------------------WRITE ------
+                    //wypisywanie wrogów
+                    for (int i = 0; i < enemies.Count; i++)
+                    {
+                        enemies[i].Write();
+                    }
+
+
                 }
+                
+                
+
             }
-            
+
         }
     }
 
     public class Enemy
     {
+        public int HP { set; get; }
+        public int HPMax { set; get; }
+        public int posX { set; get; } //szerokosc
+        public int posY { set; get; } // wysokosc
+        int power;
+        Random rnd = new Random();
 
-        public Enemy(int toDraw, int level)
+        public Enemy(int x, int y, int power)
         {
-            while (toDraw > 0)
-            {
-
-                toDraw--;
-            }
+            HPMax = rnd.Next(1, 13);
+            HP = HPMax;
+            posX = x;
+            posY = y;
+            this.power = power;
+        }
+        public void Write()
+        {
+            Console.SetCursorPosition(posX, posY);
+            Console.Write("õ");
+            
         }
 
     }
 
     public class Bullet
     {
-        
+        public int posX { set; get; } //szerokosc
+        public int posY { set; get; }
+        public Bullet(int p)
+        {
+            posX = p;
+            posY = 19;
+        }
+    
+        public void Write()
+        {
+            if (posY < 19)
+            {
+                Console.SetCursorPosition(posX, posY + 1);
+                Console.Write(" ");
+            }
+            Console.SetCursorPosition(posX, posY);
+            Console.Write("|");
+        }
+
+
     }
 
     public class Player
     {
-        public int X { set; get; }
+        public int posX { set; get; }
         int boardWidth;
         
         int HP;
         int HPMax;
-        Vector<Bullet> bullets;
+        public List<Bullet> bullets; //pociski bohatera
 
         public Player(int x, int boardWidth)
         {
-            X = x;
+            posX = x;
             HPMax = 10;
             HP = HPMax;
             this.boardWidth = boardWidth;
+            bullets = new List<Bullet>();
         }
 
         public void Left()
         {
-            if (X-1 != 0)
+            if (posX-1 != 0)
             {
-                X--;
+                posX--;
                 Write();
                 Console.Write(" ");
             }
@@ -118,10 +231,10 @@ namespace spaceShooter
 
         public void Right()
         {
-            if (X+1 != boardWidth+1)
+            if (posX+1 != boardWidth+1)
             {            
-                X++;
-                Console.SetCursorPosition(X-1, 20);
+                posX++;
+                Console.SetCursorPosition(posX-1, 20);
                 Console.Write(" ");
                 Write();
 
@@ -132,7 +245,7 @@ namespace spaceShooter
         {
             Console.ForegroundColor = ConsoleColor.Red;
 
-            Console.SetCursorPosition(X, 20);
+            Console.SetCursorPosition(posX, 20);
             Console.Write("▲");
          
             Console.ForegroundColor = ConsoleColor.White;
@@ -157,45 +270,52 @@ namespace spaceShooter
 
         public void Write() 
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
             for (int i = 1; i <= Width; i++)
             {
                 Console.SetCursorPosition(i, 0);
-                Console.Write("─");
+                Console.Write("═");
             }
 
             for (int i = 0; i <= Width; i++)
             {
                 Console.SetCursorPosition(i, (Height+1));
-                Console.Write("─");
+                Console.Write("═");
             }
 
             for (int i = 1; i <= Height; i++)
             {
                 Console.SetCursorPosition(0, i);
-                Console.Write("│");
+                Console.Write("║");
             }
 
             for (int i = 0; i <= Height; i++)
             {
                 Console.SetCursorPosition((Width + 1), i);
-                Console.Write("│");
+                Console.Write("║");
             }
 
             Console.SetCursorPosition(0,0);
-            Console.Write("┌");
+            Console.Write("╔");
             Console.SetCursorPosition(Width+1, 0);
-            Console.Write("┐");
+            Console.Write("╗");
             Console.SetCursorPosition(0, Height+1);
-            Console.Write("└");
+            Console.Write("╚");
             Console.SetCursorPosition(Width+1, Height+1);
-            Console.Write("┘");
+            Console.Write("╝");
+
+            Console.SetCursorPosition(0, 5);
+            Console.Write("╠");
+            Console.SetCursorPosition(Width + 1, 5);
+            Console.Write("╣");
 
 
             for (int i = 0; i <= Width-1; i++)
             {
                 Console.SetCursorPosition(i+1, 5);
-                Console.Write("─");
+                Console.Write("═");
             }
+            Console.ForegroundColor = ConsoleColor.White;
 
 
         }
