@@ -109,9 +109,10 @@ namespace spaceShooter
                 case 2:
                     Console.Clear();
                     Console.WriteLine("Zabij wszystkich wrogów!");
-                    Console.WriteLine("Naciśnij A aby iść w lewo");
-                    Console.WriteLine("Naciśnij D aby iść w lewo");
-                    Console.WriteLine("Naciśnij P aby strzelać");
+                    Console.WriteLine("Naciśnij strzałkę w lewo aby iść w lewo");
+                    Console.WriteLine("Naciśnij strzałkę w prawo aby iść w lewo");
+                    Console.WriteLine("Naciśnij spację aby strzelać");
+                    Console.WriteLine("Naciśnij P aby zatrzymać grę");
                     switch (Console.ReadLine())
                     {
                         case "1":
@@ -132,7 +133,6 @@ namespace spaceShooter
             Console.WriteLine("Level " + level);
             Console.WriteLine("zdobyte punkty: " + totalScore);
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\npress any key to exit the process...");
             Console.ReadKey();
             Run();
         }
