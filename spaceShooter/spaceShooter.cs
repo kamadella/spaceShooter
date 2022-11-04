@@ -20,8 +20,12 @@ namespace spaceShooter
         List<Enemy> enemies = new List<Enemy>();
         List<Shoot> shoots = new List<Shoot>();
         int enemySpawner = 10;
+        int hard = 2;
+        int level = 1;
         int score = 0;
+        int totalScore = 0;
         int timeShoot = 0;
+
         ConsoleKeyInfo keyInfo;
         ConsoleKey consoleKey;
 
@@ -38,6 +42,7 @@ namespace spaceShooter
             player = new Player(15,width);
             keyInfo = new ConsoleKeyInfo();
             consoleKey = new ConsoleKey();
+
         }
 
         void Input()
@@ -47,10 +52,93 @@ namespace spaceShooter
                 keyInfo = Console.ReadKey(true);
                 consoleKey = keyInfo.Key;
             }
+            
+        }
+
+        public bool MainMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("   _____ _____        _____ ______    _____ _    _  ____   ____ _______ ______ _____  \r\n  / ____|  __ \\ /\\   / ____|  ____|  / ____| |  | |/ __ \\ / __ \\__   __|  ____|  __ \\ \r\n | (___ | |__) /  \\ | |    | |__    | (___ | |__| | |  | | |  | | | |  | |__  | |__) |\r\n  \\___ \\|  ___/ /\\ \\| |    |  __|    \\___ \\|  __  | |  | | |  | | | |  |  __| |  _  / \r\n  ____) | |  / ____ \\ |____| |____   ____) | |  | | |__| | |__| | | |  | |____| | \\ \\ \r\n |_____/|_| /_/    \\_\\_____|______| |_____/|_|  |_|\\____/ \\____/  |_|  |______|_|  \\_\\\r\n                                                                                      \r\n                                                                                      ");
+            Console.WriteLine("Wyberz opcje:");
+            Console.WriteLine("1 - GRAJ");
+            Console.WriteLine("2 - ZMIEŃ POZIOM TRUDOSCI");
+            Console.WriteLine("3 - JAK GRAĆ");
+            Console.WriteLine("4 - EXIT");
+
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    LevelScreen();
+                    return true;
+                case "2":
+                    Console.Clear();
+                    Console.WriteLine("Wybierz opcje:");
+                    Console.WriteLine("1 - ŁATWY");
+                    Console.WriteLine("2 - TRUDNY");
+                    Console.WriteLine("3 - WRÓĆ");
+                    switch (Console.ReadLine())
+                    {
+                        case "1":
+                            hard = 1;
+                            break;
+                        case "2":
+                            hard = 2;
+                            break;
+                        case "3":
+                            break;
+                    }
+                    return true;
+                case "3":
+                    Console.Clear();
+                    Console.WriteLine("Zabij wszystkich wrogów!");
+                    Console.WriteLine("Naciśnij A aby iść w lewo");
+                    Console.WriteLine("Naciśnij D aby iść w lewo");
+                    Console.WriteLine("Naciśnij P aby strzelać");
+                    Console.WriteLine(" ");
+                    Console.WriteLine(" ");
+                    Console.WriteLine("1 - wróć");
+                    switch (Console.ReadLine())
+                    {
+                        case "1":
+                            break;
+                    }
+                    return true;
+                case "4":
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        public void LevelScreen()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Level " + level);
+            Console.WriteLine("zdobyte punkty: " + totalScore);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\npress any key to exit the process...");
+            Console.ReadKey();
+            Run();
+        }
+
+        public void GameOver()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("   _____          __  __ ______     ______      ________ _____  \r\n  / ____|   /\\   |  \\/  |  ____|   / __ \\ \\    / /  ____|  __ \\ \r\n | |  __   /  \\  | \\  / | |__     | |  | \\ \\  / /| |__  | |__) |\r\n | | |_ | / /\\ \\ | |\\/| |  __|    | |  | |\\ \\/ / |  __| |  _  / \r\n | |__| |/ ____ \\| |  | | |____   | |__| | \\  /  | |____| | \\ \\ \r\n  \\_____/_/    \\_\\_|  |_|______|   \\____/   \\/   |______|_|  \\_\\\r\n                                                                \r\n                                                                ");
+            Console.WriteLine("zdobyte punkty: " + totalScore);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\npress any key to exit the process...");
+            Console.ReadKey();
+            MainMenu();
         }
 
         public void Run()
         {
+            score = 0;
+            int row = 5;
+            int col = 1;
             while (true)
             {
                 Console.Clear();
@@ -58,11 +146,47 @@ namespace spaceShooter
                 board.Write(); //narysuj plansze
                 player.Write(); //narysuj bohatera
 
+
                 //ilsc przeciwnikow 
                 for (int i=0; i < enemySpawner; i++)
                 {
-                    var enemy = new Enemy(1 + i, 6, 2); ;
-                    enemies.Add(enemy);
+                    //Random rnd = new Random();
+
+                    if(i % 25 == 0)
+                    {
+                        row++;
+                        col = 1;
+                    }
+
+                    if (hard == 1)
+                    {
+                        if (i % 3 == 0) //co 3 przeciwnik na poziomie 2
+                        {
+                            enemies.Add(new Enemy(col, row, 2));
+                        }
+                        else
+                        {
+                            enemies.Add(new Enemy(col, row, 1));
+                        }
+                    }
+                    if (hard == 2)
+                    {
+                        if (i % 3 == 0 && i % 2 == 0) //co któryś przeciwnik na poziomie 3
+                        {
+                            enemies.Add(new Enemy(col, row, 3));
+                        }
+                        else if (i % 3 == 0) //co 3 przeciwnik na poziomie 2
+                        {
+                            enemies.Add(new Enemy(col, row, 2));
+                        }
+                        else
+                        {
+                            enemies.Add(new Enemy(col, row, 1));
+                        }
+                    }
+
+                    col++;
+
                 }
 
 
@@ -81,7 +205,7 @@ namespace spaceShooter
                         case ConsoleKey.P: //strzelanie
                             var bullet = new Bullet(player.posX);
                             player.bullets.Add(bullet); //jak klikne P to powstaje nowy pocisk
-                            timeShoot++;
+                            //timeShoot++;
                             break;
                     }
                     consoleKey = ConsoleKey.N;
@@ -89,8 +213,12 @@ namespace spaceShooter
 
                     //wynik
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.SetCursorPosition(4, 2);
+                    Console.SetCursorPosition(4, 1);
                     Console.Write("Punkty: " + score);
+                    Console.SetCursorPosition(4, 2);
+                    Console.Write("Poziom: " + level);
+                    Console.SetCursorPosition(4, 3);
+                    Console.Write("Życie: " + player.HP);
                     Console.ForegroundColor = ConsoleColor.White;
 
                     
@@ -143,18 +271,19 @@ namespace spaceShooter
                         //zderzenie z pociskiem 
                         if ((shoots[i].posY) + 1 == height-1 && shoots[i].posX == player.posX)
                         {
-                            if (player.HP <= 1) //śmierć gracza
+                            if (player.HP <= 1) //PRZEGRANA
                             {
-                                Console.SetCursorPosition(7, 15);
-                                Console.Write("GAME OVER");
+                                level = 1;
+                                enemySpawner = 5;
+                                level = 1;
+                                totalScore = 0;
+                                timeShoot = 0;
+                                GameOver();
                             }
                             else
                                 player.HP--; //obrażenia dla gracz
 
                         }
-
-
-
 
                         if (shoots[i].posY > height-1) //usun shoota jak wyjdzie poza plansze
                         {
@@ -169,21 +298,45 @@ namespace spaceShooter
 
                     Random rnd = new Random();
                     int who = rnd.Next(0, enemies.Count);
-                    if (timeShoot > 10)
+                    if (timeShoot > 100)
                     {
-                        var shoot = new Shoot(enemies[who].posX, enemies[who].posY); ;
+                        var shoot = new Shoot(enemies[who].posX, enemies[who].posY);
                         shoots.Add(shoot);
                         timeShoot = 0;
                     }
 
-                    //------------------- WRITE ------
+                    timeShoot += enemySpawner;
+
+
                     //wypisywanie wrogów
                     for (int i = 0; i < enemies.Count; i++)
                     {
                         enemies[i].Write();
                     }
 
-                    timeShoot++;
+                    
+
+
+                    //Wygrana
+                    if (enemies.Count == 0) 
+                    {
+                        totalScore += score;
+                        level++;
+                        player.HP = 10;
+                        
+                        if (hard == 1) //jak poziom easy to zwiekszamy o 5 przeciwnikow
+                        {
+                            enemySpawner += 5;
+                        }
+                        if(hard == 2) //jak poziom hard to zwiekszamy o 10 przeciwnikow
+                        {
+                            enemySpawner += 10;
+                        }
+                        
+                        LevelScreen();
+                    }
+
+
                 }
             }
         }
@@ -224,6 +377,7 @@ namespace spaceShooter
         }
         public void Write()
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             if (power == 1)
             {
                 Console.SetCursorPosition(posX, posY);
@@ -239,7 +393,7 @@ namespace spaceShooter
                 Console.SetCursorPosition(posX, posY);
                 Console.Write("Q");
             }
-
+            Console.ForegroundColor = ConsoleColor.White;
 
         }
     }
@@ -258,11 +412,12 @@ namespace spaceShooter
         {
             Console.SetCursorPosition(posX, posY - 1);
             Console.Write(" ");
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.SetCursorPosition(posX, posY);
             Console.Write("|");
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
-
 
     public class Bullet
     {
@@ -281,7 +436,7 @@ namespace spaceShooter
                 Console.SetCursorPosition(posX, posY + 1);
                 Console.Write(" ");
             }
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.SetCursorPosition(posX, posY);
             Console.Write("^");
             Console.ForegroundColor = ConsoleColor.White;
@@ -300,7 +455,7 @@ namespace spaceShooter
         public Player(int x, int boardWidth)
         {
             posX = x;
-            HPMax = 2;
+            HPMax = 9;
             HP = HPMax;
             this.boardWidth = boardWidth;
             bullets = new List<Bullet>();
@@ -330,7 +485,7 @@ namespace spaceShooter
 
         public void Write()
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Cyan;
 
             Console.SetCursorPosition(posX, 20);
             Console.Write("▲");
