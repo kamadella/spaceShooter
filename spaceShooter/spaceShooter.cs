@@ -17,7 +17,6 @@ namespace spaceShooter
         int height;
         Board board;
         Player player;
-        int shootTimer = 20;
         List<Enemy> enemies = new List<Enemy>();
         int enemySpawner = 10;
         int score = 0;
@@ -57,12 +56,10 @@ namespace spaceShooter
                 board.Write(); //narysuj plansze
                 player.Write(); //narysuj bohatera
 
-
-
                 //ilsc przeciwnikow 
                 for (int i=0; i < enemySpawner; i++)
                 {
-                    var enemy = new Enemy(2 + i, 6, 1); ;
+                    var enemy = new Enemy(1 + i, 6, 2); ;
                     enemies.Add(enemy);
                     
                 }
@@ -103,33 +100,34 @@ namespace spaceShooter
                         player.bullets[i].posY -= 1;
                         player.bullets[i].Write();
 
-
-
                         for (int k = 0; k < enemies.Count; k++)
                         {
-                            if (player.bullets[i].posY == enemies[k].posY && player.bullets[i].posX == enemies[k].posX)
+                            if ((player.bullets[i].posY)+1 == (enemies[k].posY)+1 && player.bullets[i].posX == enemies[k].posX)
                             {
-                                if (enemies[k].HP <= 1)
+                                if (enemies[k].HP <= 1) //śmierć wroga
                                 {
                                     score += enemies[k].HPMax;
-                                    enemies.RemoveAt(i);
+                                    enemies.RemoveAt(k);
                                 }
                                 else
                                     enemies[k].HP--; //obrażenia dla wroga
 
+                                Console.SetCursorPosition(player.bullets[i].posX, player.bullets[i].posY);
+                                Console.Write(" ");
                                 player.bullets.RemoveAt(i);
                                 break;
                             }
+                            else if (player.bullets[i].posY < 6) //usun bulleta jak wyjdzie poza plansze
+                            {
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                Console.SetCursorPosition(player.bullets[i].posX, player.bullets[i].posY);
+                                Console.Write("═");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                player.bullets.RemoveAt(i);
+                                break;
+                            }
+
                         }
-
-                        if (player.bullets[i].posY <= 6) //usun bulleta jak wyjdzie poza plansze
-                        {
-                            Console.SetCursorPosition(player.bullets[i].posX, player.bullets[i].posY);
-                            Console.Write(" ");
-                            player.bullets.RemoveAt(i);
-                        }
-
-
                     }
 
 
@@ -159,23 +157,76 @@ namespace spaceShooter
         public int posY { set; get; } // wysokosc
         int power;
         Random rnd = new Random();
+        public List<BulletEnemy> bulletsEnemy; //pociski wrogów
 
         public Enemy(int x, int y, int power)
         {
-            HPMax = rnd.Next(1, 13);
-            HP = HPMax;
-            posX = x;
-            posY = y;
             this.power = power;
+            posX = x;
+            posY = y;                        
+            bulletsEnemy = new List<BulletEnemy>();
+
+            if (power == 1)
+            {
+                HPMax = 3;
+                HP = HPMax;
+            }
+            if (power == 2)
+            {
+                HPMax = 6;
+                HP = HPMax;
+            }
+            if (power == 3)
+            {
+                HPMax = 9;
+                HP = HPMax;
+            }
+
         }
         public void Write()
         {
-            Console.SetCursorPosition(posX, posY);
-            Console.Write("õ");
-            
+            if (power == 1)
+            {
+                Console.SetCursorPosition(posX, posY);
+                Console.Write("o");
+            }
+            if (power == 2)
+            {
+                Console.SetCursorPosition(posX, posY);
+                Console.Write("O");
+            }
+            if (power == 3)
+            {
+                Console.SetCursorPosition(posX, posY);
+                Console.Write("Q");
+            }
+
+
+        }
+    }
+
+    public class BulletEnemy
+    {
+        public int posX { set; get; } //szerokosc
+        public int posY { set; get; }
+        public BulletEnemy(int p)
+        {
+            posX = p;
+            posY = 19;
         }
 
+        public void Write()
+        {
+            if (posY < 19)
+            {
+                Console.SetCursorPosition(posX, posY + 1);
+                Console.Write(" ");
+            }
+            Console.SetCursorPosition(posX, posY);
+            Console.Write("|");
+        }
     }
+
 
     public class Bullet
     {
@@ -194,11 +245,11 @@ namespace spaceShooter
                 Console.SetCursorPosition(posX, posY + 1);
                 Console.Write(" ");
             }
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.SetCursorPosition(posX, posY);
-            Console.Write("|");
+            Console.Write("^");
+            Console.ForegroundColor = ConsoleColor.White;
         }
-
-
     }
 
     public class Player
