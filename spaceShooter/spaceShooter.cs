@@ -7,6 +7,7 @@ using System.Threading;
 using System.Numerics;
 using System.Collections;
 using static System.Formats.Asn1.AsnWriter;
+using static System.Console;
 
 namespace spaceShooter
 {
@@ -19,8 +20,9 @@ namespace spaceShooter
         Player player;
         List<Enemy> enemies = new List<Enemy>();
         List<Shoot> shoots = new List<Shoot>();
+        Menu menu;
         int enemySpawner = 10;
-        int hard = 2;
+        int hard = 1;
         int level = 1;
         int score = 0;
         int totalScore = 0;
@@ -58,52 +60,65 @@ namespace spaceShooter
         public bool MainMenu()
         {
             Console.Clear();
-            Console.WriteLine("   _____ _____        _____ ______    _____ _    _  ____   ____ _______ ______ _____  \r\n  / ____|  __ \\ /\\   / ____|  ____|  / ____| |  | |/ __ \\ / __ \\__   __|  ____|  __ \\ \r\n | (___ | |__) /  \\ | |    | |__    | (___ | |__| | |  | | |  | | | |  | |__  | |__) |\r\n  \\___ \\|  ___/ /\\ \\| |    |  __|    \\___ \\|  __  | |  | | |  | | | |  |  __| |  _  / \r\n  ____) | |  / ____ \\ |____| |____   ____) | |  | | |__| | |__| | | |  | |____| | \\ \\ \r\n |_____/|_| /_/    \\_\\_____|______| |_____/|_|  |_|\\____/ \\____/  |_|  |______|_|  \\_\\\r\n                                                                                      \r\n                                                                                      ");
-            Console.WriteLine("Wyberz opcje:");
-            Console.WriteLine("1 - GRAJ");
-            Console.WriteLine("2 - ZMIEŃ POZIOM TRUDOSCI");
-            Console.WriteLine("3 - JAK GRAĆ");
-            Console.WriteLine("4 - EXIT");
+            //Console.WriteLine("   _____ _____        _____ ______    _____ _    _  ____   ____ _______ ______ _____  \r\n  / ____|  __ \\ /\\   / ____|  ____|  / ____| |  | |/ __ \\ / __ \\__   __|  ____|  __ \\ \r\n | (___ | |__) /  \\ | |    | |__    | (___ | |__| | |  | | |  | | | |  | |__  | |__) |\r\n  \\___ \\|  ___/ /\\ \\| |    |  __|    \\___ \\|  __  | |  | | |  | | | |  |  __| |  _  / \r\n  ____) | |  / ____ \\ |____| |____   ____) | |  | | |__| | |__| | | |  | |____| | \\ \\ \r\n |_____/|_| /_/    \\_\\_____|______| |_____/|_|  |_|\\____/ \\____/  |_|  |______|_|  \\_\\\r\n                                                                                      \r\n                                                                                      ");
 
-            switch (Console.ReadLine())
+            string[] menuOptions = {"Graj" , "Zmień poziom trudności" , "Jak grać" , "Wyjdź"};
+
+            string prompt = "   _____ _____        _____ ______    _____ _    _  ____   ____ _______ ______ _____  \r\n  / ____|  __ \\ /\\   / ____|  ____|  / ____| |  | |/ __ \\ / __ \\__   __|  ____|  __ \\ \r\n | (___ | |__) /  \\ | |    | |__    | (___ | |__| | |  | | |  | | | |  | |__  | |__) |\r\n  \\___ \\|  ___/ /\\ \\| |    |  __|    \\___ \\|  __  | |  | | |  | | | |  |  __| |  _  / \r\n  ____) | |  / ____ \\ |____| |____   ____) | |  | | |__| | |__| | | |  | |____| | \\ \\ \r\n |_____/|_| /_/    \\_\\_____|______| |_____/|_|  |_|\\____/ \\____/  |_|  |______|_|  \\_\\\r\n                                                                                      \r\n                                                                                      \nWitaj w spaceShooter co chcesz zrobić?";
+            menu = new Menu(prompt, menuOptions);
+            int selectedIndex = menu.Run();
+
+            //Console.WriteLine("Press any key to exit");
+            //ReadKey(true);
+            
+            //Console.Clear();
+            //Console.WriteLine("Wyberz opcje:");
+            //Console.WriteLine("1 - GRAJ");
+            //Console.WriteLine("2 - ZMIEŃ POZIOM TRUDOSCI");
+            //Console.WriteLine("3 - JAK GRAĆ");
+            //Console.WriteLine("4 - EXIT");
+
+            
+            switch (selectedIndex)
             {
-                case "1":
+                case 0:
                     LevelScreen();
                     return true;
-                case "2":
-                    Console.Clear();
-                    Console.WriteLine("Wybierz opcje:");
-                    Console.WriteLine("1 - ŁATWY");
-                    Console.WriteLine("2 - TRUDNY");
-                    Console.WriteLine("3 - WRÓĆ");
-                    switch (Console.ReadLine())
+                case 1:
+                    //Console.Clear();
+                    string prompt2 = "Wybierz opcje:";
+                    string[] levelOptions = { "Łatwy", "Trudny", "Wróć"};
+                    Menu levelMenu = new Menu(prompt2, levelOptions);
+                    int selectedLevel = levelMenu.Run();
+                    //Console.WriteLine("Wybierz opcje:");
+                    //Console.WriteLine("1 - ŁATWY");
+                    //Console.WriteLine("2 - TRUDNY");
+                    //Console.WriteLine("3 - WRÓĆ");
+                    switch (selectedLevel)
                     {
-                        case "1":
+                        case 0:
                             hard = 1;
                             break;
-                        case "2":
+                        case 1:
                             hard = 2;
                             break;
-                        case "3":
+                        case 2:
                             break;
                     }
                     return true;
-                case "3":
+                case 2:
                     Console.Clear();
                     Console.WriteLine("Zabij wszystkich wrogów!");
                     Console.WriteLine("Naciśnij A aby iść w lewo");
                     Console.WriteLine("Naciśnij D aby iść w lewo");
                     Console.WriteLine("Naciśnij P aby strzelać");
-                    Console.WriteLine(" ");
-                    Console.WriteLine(" ");
-                    Console.WriteLine("1 - wróć");
                     switch (Console.ReadLine())
                     {
                         case "1":
                             break;
                     }
                     return true;
-                case "4":
+                case 3:
                     return false;
                 default:
                     return true;
@@ -196,16 +211,19 @@ namespace spaceShooter
                     Input();
                     switch (consoleKey)
                     {
-                        case ConsoleKey.A:
+                        case ConsoleKey.LeftArrow:
                             player.Left();
                             break;
-                        case ConsoleKey.D:
+                        case ConsoleKey.RightArrow:
                             player.Right();
                             break;
-                        case ConsoleKey.P: //strzelanie
+                        case ConsoleKey.Spacebar: //strzelanie
                             var bullet = new Bullet(player.posX);
                             player.bullets.Add(bullet); //jak klikne P to powstaje nowy pocisk
                             //timeShoot++;
+                            break;
+                        case ConsoleKey.P:
+                            Console.ReadLine();
                             break;
                     }
                     consoleKey = ConsoleKey.N;
@@ -560,6 +578,79 @@ namespace spaceShooter
             Console.ForegroundColor = ConsoleColor.White;
 
 
+        }
+    }
+
+    public class Menu
+    {
+        private int selectedIndex;
+        private string[] options;
+        private string prompt;
+
+        public Menu(string prompt, string[] options)
+        {
+            this.prompt = prompt;
+            this.options = options;
+            selectedIndex = 0;
+        }
+
+        private void DisplayOptions()
+        {
+            Console.WriteLine(prompt);
+            for (int i = 0; i < options.Length; i++)
+            {
+                string currentOption = options[i];
+                string prefix;
+
+                if (i == selectedIndex)
+                {
+                    prefix = "*";
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    prefix = " ";
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+
+                Console.WriteLine(prefix + " << " + currentOption + " >> ");
+            }
+            ResetColor();
+        }
+
+        public int Run() 
+        {
+            ConsoleKey keyPressed;
+            do
+            {
+                Console.Clear();
+                DisplayOptions();
+                ConsoleKeyInfo keyInfo = ReadKey(true);
+                keyPressed = keyInfo.Key;
+
+                if(keyPressed == ConsoleKey.UpArrow)
+                {
+                    selectedIndex--;
+                    if(selectedIndex == -1)
+                    {
+                        selectedIndex = options.Length - 1;
+                    }
+                }
+                else if( keyPressed == ConsoleKey.DownArrow)
+                {
+                    selectedIndex++;
+                    if(selectedIndex == options.Length)
+                    {
+                        selectedIndex = 0;
+                    }
+                }
+
+            } while (keyPressed != ConsoleKey.Enter);
+
+            
+            return selectedIndex;
         }
     }
 }
