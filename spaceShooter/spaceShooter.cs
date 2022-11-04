@@ -18,8 +18,10 @@ namespace spaceShooter
         Board board;
         Player player;
         List<Enemy> enemies = new List<Enemy>();
+        List<Shoot> shoots = new List<Shoot>();
         int enemySpawner = 10;
         int score = 0;
+        int timeShoot = 0;
         ConsoleKeyInfo keyInfo;
         ConsoleKey consoleKey;
 
@@ -61,7 +63,6 @@ namespace spaceShooter
                 {
                     var enemy = new Enemy(1 + i, 6, 2); ;
                     enemies.Add(enemy);
-                    
                 }
 
 
@@ -78,8 +79,9 @@ namespace spaceShooter
                             player.Right();
                             break;
                         case ConsoleKey.P: //strzelanie
-                                var bullet = new Bullet(player.posX);
-                                player.bullets.Add(bullet); //jak klikne P to powstaje nowy pocisk
+                            var bullet = new Bullet(player.posX);
+                            player.bullets.Add(bullet); //jak klikne P to powstaje nowy pocisk
+                            timeShoot++;
                             break;
                     }
                     consoleKey = ConsoleKey.N;
@@ -91,7 +93,7 @@ namespace spaceShooter
                     Console.Write("Punkty: " + score);
                     Console.ForegroundColor = ConsoleColor.White;
 
-
+                    
 
                     //Bullets
                     for (int i = 0; i < player.bullets.Count; i++)
@@ -100,9 +102,11 @@ namespace spaceShooter
                         player.bullets[i].posY -= 1;
                         player.bullets[i].Write();
 
+
                         for (int k = 0; k < enemies.Count; k++)
                         {
-                            if ((player.bullets[i].posY)+1 == (enemies[k].posY)+1 && player.bullets[i].posX == enemies[k].posX)
+
+                            if ((player.bullets[i].posY) + 1 == (enemies[k].posY) + 1 && player.bullets[i].posX == enemies[k].posX)
                             {
                                 if (enemies[k].HP <= 1) //śmierć wroga
                                 {
@@ -130,22 +134,58 @@ namespace spaceShooter
                         }
                     }
 
+                    for (int i = 0; i < shoots.Count; i++)
+                    {
+                        //wypisywanie pocisku
+                        shoots[i].posY += 1;
+                        shoots[i].Write();
+
+                        //zderzenie z pociskiem 
+                        if ((shoots[i].posY) + 1 == height-1 && shoots[i].posX == player.posX)
+                        {
+                            if (player.HP <= 1) //śmierć gracza
+                            {
+                                Console.SetCursorPosition(7, 15);
+                                Console.Write("GAME OVER");
+                            }
+                            else
+                                player.HP--; //obrażenia dla gracz
+
+                        }
 
 
-                    //------------------------WRITE ------
+
+
+                        if (shoots[i].posY > height-1) //usun shoota jak wyjdzie poza plansze
+                        {
+                            Console.SetCursorPosition(shoots[i].posX, shoots[i].posY);
+                            Console.Write(" ");
+                            player.Write();
+                            shoots.RemoveAt(i);
+                            
+                        }
+                    }
+
+
+                    Random rnd = new Random();
+                    int who = rnd.Next(0, enemies.Count);
+                    if (timeShoot > 10)
+                    {
+                        var shoot = new Shoot(enemies[who].posX, enemies[who].posY); ;
+                        shoots.Add(shoot);
+                        timeShoot = 0;
+                    }
+
+                    //------------------- WRITE ------
                     //wypisywanie wrogów
                     for (int i = 0; i < enemies.Count; i++)
                     {
                         enemies[i].Write();
                     }
 
-
+                    timeShoot++;
                 }
-                
-                
-
             }
-
         }
     }
 
@@ -156,15 +196,14 @@ namespace spaceShooter
         public int posX { set; get; } //szerokosc
         public int posY { set; get; } // wysokosc
         int power;
-        Random rnd = new Random();
-        public List<BulletEnemy> bulletsEnemy; //pociski wrogów
+        //Random rnd = new Random();
+
 
         public Enemy(int x, int y, int power)
         {
             this.power = power;
             posX = x;
-            posY = y;                        
-            bulletsEnemy = new List<BulletEnemy>();
+            posY = y;
 
             if (power == 1)
             {
@@ -205,23 +244,20 @@ namespace spaceShooter
         }
     }
 
-    public class BulletEnemy
+    public class Shoot
     {
         public int posX { set; get; } //szerokosc
         public int posY { set; get; }
-        public BulletEnemy(int p)
+        public Shoot(int x, int y)
         {
-            posX = p;
-            posY = 19;
+            posX = x;
+            posY = y;
         }
 
         public void Write()
         {
-            if (posY < 19)
-            {
-                Console.SetCursorPosition(posX, posY + 1);
-                Console.Write(" ");
-            }
+            Console.SetCursorPosition(posX, posY - 1);
+            Console.Write(" ");
             Console.SetCursorPosition(posX, posY);
             Console.Write("|");
         }
@@ -257,14 +293,14 @@ namespace spaceShooter
         public int posX { set; get; }
         int boardWidth;
         
-        int HP;
+        public int HP { set; get; }
         int HPMax;
         public List<Bullet> bullets; //pociski bohatera
 
         public Player(int x, int boardWidth)
         {
             posX = x;
-            HPMax = 10;
+            HPMax = 2;
             HP = HPMax;
             this.boardWidth = boardWidth;
             bullets = new List<Bullet>();
