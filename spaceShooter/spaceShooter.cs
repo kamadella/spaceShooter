@@ -113,11 +113,7 @@ namespace spaceShooter
                     Console.WriteLine("Naciśnij strzałkę w prawo aby iść w lewo");
                     Console.WriteLine("Naciśnij spację aby strzelać");
                     Console.WriteLine("Naciśnij P aby zatrzymać grę");
-                    switch (Console.ReadLine())
-                    {
-                        case "1":
-                            break;
-                    }
+                    Console.ReadKey();
                     return true;
                 case 3:
                     return false;
